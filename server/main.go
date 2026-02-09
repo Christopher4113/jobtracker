@@ -1,20 +1,57 @@
 package main
 
 import (
-    "log"
+	"log"
+	"os"
 
-    "github.com/gofiber/fiber/v2"
-    "github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/joho/godotenv"
+
+	"server/helpers"
+	"server/services"
+	"server/controllers"
 )
 
 func main() {
-    app := fiber.New()
+	_ = godotenv.Load()
 
-    app.Use(cors.New())
+	app := fiber.New()
 
-    app.Get("/", func(c *fiber.Ctx) error {
-        return c.SendString("hello world")
-    })
+	origin := os.Getenv("CORS_ORIGIN")
+	if origin == "" {
+		origin = "http://localhost:5173"
+	}
 
-    log.Fatal(app.Listen(":8080"))
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: origin,
+		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
+		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+	}))
+
+	// DB
+	if err := services.ConnectMongo(); err != nil {
+		log.Fatal(err)
+	}
+	defer services.DisconnectMongo()
+
+	// Routes
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("hello world")
+	})
+
+	api := app.Group("/api")
+
+	auth := api.Group("/auth")
+	auth.Post("/signup", controllers.Signup)
+	auth.Post("/login", controllers.Login)
+
+	// Protected
+	api.Get("/me", helpers.RequireAuth(), controllers.Me)
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Fatal(app.Listen(":" + port))
 }
