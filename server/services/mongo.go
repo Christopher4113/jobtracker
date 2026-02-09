@@ -55,3 +55,7 @@ func DisconnectMongo() {
 func UsersCollection() *mongo.Collection {
 	return db.Collection("users")
 }
+
+func JobsCollection() *mongo.Collection {
+	return db.Collection("jobs")
+}

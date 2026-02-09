@@ -49,6 +49,12 @@ func main() {
 	// Protected
 	api.Get("/me", helpers.RequireAuth(), controllers.Me)
 
+	jobs := api.Group("/jobs", helpers.RequireAuth())
+	jobs.Get("/", controllers.ListJobs)
+	jobs.Post("/", controllers.CreateJob)
+	jobs.Put("/:id", controllers.UpdateJob)
+	jobs.Delete("/:id", controllers.DeleteJob)
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
