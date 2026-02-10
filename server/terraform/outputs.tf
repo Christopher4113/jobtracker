@@ -27,3 +27,25 @@ output "codebuild_role_arn" {
   description = "ARN of the CodeBuild service role"
   value       = aws_iam_role.codebuild.arn
 }
+
+# Lambda Function outputs
+output "lambda_function_name" {
+  description = "Name of the Lambda function"
+  value       = aws_lambda_function.api.function_name
+}
+
+output "lambda_function_arn" {
+  description = "ARN of the Lambda function"
+  value       = aws_lambda_function.api.arn
+}
+
+# API Gateway outputs
+output "api_url" {
+  description = "URL of the API Gateway endpoint - use this to access the Job Tracker API"
+  value       = aws_apigatewayv2_stage.default.invoke_url
+}
+
+output "api_gateway_id" {
+  description = "ID of the HTTP API Gateway"
+  value       = aws_apigatewayv2_api.api.id
+}
