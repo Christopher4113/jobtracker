@@ -38,18 +38,18 @@ resource "aws_codebuild_project" "go_build" {
           commands:
             - echo "Preparing build environment..."
             - mkdir -p /tmp/build
-            - aws s3 cp s3://$S3_BUCKET/source/server.zip /tmp/build/server.zip || echo "No source zip found, expecting source in context"
-            - cd /tmp/build && unzip -o server.zip || true
+            - aws s3 cp s3://$S3_BUCKET/source/server.tar.gz /tmp/build/server.tar.gz
+            - cd /tmp/build && tar -xzf server.tar.gz
         build:
           commands:
             - echo "Building Go binary..."
-            - cd /tmp/build/server || cd /tmp/build
+            - cd /tmp/build
             - go mod download
             - GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -tags lambda.norpc -o bootstrap main.go
         post_build:
           commands:
             - echo "Packaging and uploading..."
-            - cd /tmp/build/server || cd /tmp/build
+            - cd /tmp/build
             - zip function.zip bootstrap
             - aws s3 cp function.zip s3://$S3_BUCKET/$S3_KEY
             - echo "Build complete. Artifact uploaded to s3://$S3_BUCKET/$S3_KEY"

@@ -14,13 +14,13 @@ resource "null_resource" "build_trigger" {
       # Navigate to server directory
       cd ${path.module}/..
 
-      # Create zip excluding terraform and hidden files
-      echo "Creating source zip..."
-      zip -r /tmp/server.zip . -x "terraform/*" -x ".*" -x "*.zip"
+      # Create tar.gz excluding terraform and hidden files
+      echo "Creating source archive..."
+      tar --exclude='./terraform' --exclude='./.git' --exclude='./.gitignore' --exclude='*.zip' --exclude='*.tar.gz' -czf /tmp/server.tar.gz .
 
       # Upload to S3
       echo "Uploading source to S3..."
-      aws s3 cp /tmp/server.zip s3://${aws_s3_bucket.artifacts.bucket}/source/server.zip
+      aws s3 cp /tmp/server.tar.gz s3://${aws_s3_bucket.artifacts.bucket}/source/server.tar.gz
 
       # Start build and capture build ID
       echo "Starting CodeBuild..."
@@ -40,7 +40,7 @@ resource "null_resource" "build_trigger" {
           echo "Build failed with status: $STATUS"
           # Get build logs for debugging
           aws codebuild batch-get-builds --ids $BUILD_ID --query 'builds[0].phases[*].[phaseType,phaseStatus]' --output table --region us-east-1 || true
-          rm -f /tmp/server.zip
+          rm -f /tmp/server.tar.gz
           exit 1
         fi
 
@@ -50,13 +50,13 @@ resource "null_resource" "build_trigger" {
 
         if [ $ELAPSED -ge $TIMEOUT ]; then
           echo "Build timed out after $TIMEOUT seconds"
-          rm -f /tmp/server.zip
+          rm -f /tmp/server.tar.gz
           exit 1
         fi
       done
 
       # Clean up
-      rm -f /tmp/server.zip
+      rm -f /tmp/server.tar.gz
       echo "=== Build trigger complete ==="
     EOF
   }
