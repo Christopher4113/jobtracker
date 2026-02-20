@@ -35,16 +35,20 @@ resource "aws_lambda_function" "api" {
       # Secrets ARN for SDK-based retrieval
       SECRETS_ARN = aws_secretsmanager_secret.app_secrets.arn
 
-      # Pass secrets directly as environment variables
-      MONGO_URI  = jsondecode(aws_secretsmanager_secret_version.app_secrets.secret_string)["MONGO_URI"]
+      # JWT Secret for authentication
       JWT_SECRET = jsondecode(aws_secretsmanager_secret_version.app_secrets.secret_string)["JWT_SECRET"]
+
+      # DynamoDB table names
+      USERS_TABLE_NAME = aws_dynamodb_table.users.name
+      JOBS_TABLE_NAME  = aws_dynamodb_table.jobs.name
     }
   }
 
   depends_on = [
     null_resource.build_trigger,
     aws_iam_role_policy.lambda_logs,
-    aws_iam_role_policy.lambda_secrets
+    aws_iam_role_policy.lambda_secrets,
+    aws_iam_role_policy.lambda_dynamodb
   ]
 
   tags = {
