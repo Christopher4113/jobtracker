@@ -3,6 +3,8 @@
 ## Setup
 
 - Install Terraform CLI (required for infrastructure deployment)
+- Install Go 1.23+ (required for building the server)
+- Run `go mod tidy` in `server/` directory to resolve dependencies after updating go.mod
 
 ## Deploy
 

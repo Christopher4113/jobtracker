@@ -1,34 +1,25 @@
 package models
 
-import (
-	"time"
-
-	"go.mongodb.org/mongo-driver/bson/primitive"
-)
-
 type JobStatus string
 
 const (
-	StatusApplied     JobStatus = "applied"
+	StatusApplied      JobStatus = "applied"
 	StatusInterviewing JobStatus = "interviewing"
-	StatusOffer       JobStatus = "offer"
-	StatusRejected    JobStatus = "rejected"
+	StatusOffer        JobStatus = "offer"
+	StatusRejected     JobStatus = "rejected"
 )
 
 type Job struct {
-	ID              primitive.ObjectID `bson:"_id" json:"id"`
-	UserID          string             `bson:"userId" json:"userId"`
-	Company         string             `bson:"company" json:"company"`
-	Role            string             `bson:"role" json:"role"`
-	Location        string             `bson:"location" json:"location"`
-	Status          JobStatus           `bson:"status" json:"status"`
-	StatusUpdatedAt time.Time          `bson:"statusUpdatedAt" json:"statusUpdatedAt"`
-
-	// optional but useful
-	Link   string `bson:"link,omitempty" json:"link,omitempty"`
-	Notes  string `bson:"notes,omitempty" json:"notes,omitempty"`
-	Source string `bson:"source,omitempty" json:"source,omitempty"` // referral, linkedin, etc
-
-	CreatedAt time.Time `bson:"createdAt" json:"createdAt"`
-	UpdatedAt time.Time `bson:"updatedAt" json:"updatedAt"`
+	ID              string    `json:"id" dynamodbav:"id"`
+	UserID          string    `json:"userId" dynamodbav:"userId"`
+	Company         string    `json:"company" dynamodbav:"company"`
+	Role            string    `json:"role" dynamodbav:"role"`
+	Location        string    `json:"location" dynamodbav:"location"`
+	Status          JobStatus `json:"status" dynamodbav:"status"`
+	StatusUpdatedAt string    `json:"statusUpdatedAt" dynamodbav:"statusUpdatedAt"`
+	Link            string    `json:"link,omitempty" dynamodbav:"link,omitempty"`
+	Notes           string    `json:"notes,omitempty" dynamodbav:"notes,omitempty"`
+	Source          string    `json:"source,omitempty" dynamodbav:"source,omitempty"`
+	CreatedAt       string    `json:"createdAt" dynamodbav:"createdAt"`
+	UpdatedAt       string    `json:"updatedAt" dynamodbav:"updatedAt"`
 }
