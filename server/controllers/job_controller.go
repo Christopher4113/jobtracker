@@ -2,11 +2,9 @@ package controllers
 
 import (
 	"strings"
-	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/google/uuid"
 
 	"server/models"
 	"server/services"
@@ -61,10 +59,10 @@ func CreateJob(c *fiber.Ctx) error {
 		status = string(models.StatusApplied)
 	}
 
-	now := time.Now().UTC()
+	now := services.NowUTC()
 
 	j := models.Job{
-		ID:              primitive.NewObjectID(),
+		ID:              uuid.New().String(),
 		UserID:          userID,
 		Company:         company,
 		Role:            role,
@@ -94,8 +92,8 @@ func UpdateJob(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": "Invalid request body"})
 	}
 
-	update := bson.M{}
-	now := time.Now().UTC()
+	update := map[string]interface{}{}
+	now := services.NowUTC()
 
 	if body.Company != nil {
 		update["company"] = strings.TrimSpace(*body.Company)
