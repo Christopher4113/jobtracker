@@ -63,6 +63,35 @@ resource "aws_iam_role_policy" "lambda_secrets" {
   })
 }
 
+# Lambda DynamoDB policy
+resource "aws_iam_role_policy" "lambda_dynamodb" {
+  name = "${var.project_name}-lambda-dynamodb-policy"
+  role = aws_iam_role.lambda_execution.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ]
+        Resource = [
+          aws_dynamodb_table.users.arn,
+          aws_dynamodb_table.jobs.arn,
+          "${aws_dynamodb_table.users.arn}/index/*",
+          "${aws_dynamodb_table.jobs.arn}/index/*"
+        ]
+      }
+    ]
+  })
+}
+
 # CodeBuild service role
 resource "aws_iam_role" "codebuild" {
   name = "${var.project_name}-codebuild-role"
