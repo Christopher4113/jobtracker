@@ -49,3 +49,24 @@ output "api_gateway_id" {
   description = "ID of the HTTP API Gateway"
   value       = aws_apigatewayv2_api.api.id
 }
+
+# DynamoDB Table outputs
+output "users_table_name" {
+  description = "Name of the DynamoDB users table"
+  value       = aws_dynamodb_table.users.name
+}
+
+output "jobs_table_name" {
+  description = "Name of the DynamoDB jobs table"
+  value       = aws_dynamodb_table.jobs.name
+}
+
+output "users_table_arn" {
+  description = "ARN of the DynamoDB users table"
+  value       = aws_dynamodb_table.users.arn
+}
+
+output "jobs_table_arn" {
+  description = "ARN of the DynamoDB jobs table"
+  value       = aws_dynamodb_table.jobs.arn
+}
