@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/google/uuid"
 
 	"server/helpers"
 	"server/models"
@@ -53,9 +53,9 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Server error"})
 	}
 
-	now := time.Now().UTC()
+	now := services.NowUTC()
 	u := models.User{
-		ID:           primitive.NewObjectID(),
+		ID:           uuid.New().String(),
 		Name:         body.Name,
 		Email:        body.Email,
 		PasswordHash: hash,
@@ -70,14 +70,14 @@ func Signup(c *fiber.Ctx) error {
 	secret := os.Getenv("JWT_SECRET")
 	expiresMin := helpers.GetEnvInt("JWT_EXPIRES_MINUTES", 60)
 
-	token, err := helpers.SignJWT(u.ID.Hex(), u.Email, secret, time.Duration(expiresMin)*time.Minute)
+	token, err := helpers.SignJWT(u.ID, u.Email, secret, time.Duration(expiresMin)*time.Minute)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Server error"})
 	}
 
 	return c.JSON(fiber.Map{
 		"token": token,
-		"user": fiber.Map{"id": u.ID.Hex(), "name": u.Name, "email": u.Email},
+		"user":  fiber.Map{"id": u.ID, "name": u.Name, "email": u.Email},
 	})
 }
 
@@ -103,14 +103,14 @@ func Login(c *fiber.Ctx) error {
 	secret := os.Getenv("JWT_SECRET")
 	expiresMin := helpers.GetEnvInt("JWT_EXPIRES_MINUTES", 60)
 
-	token, err := helpers.SignJWT(u.ID.Hex(), u.Email, secret, time.Duration(expiresMin)*time.Minute)
+	token, err := helpers.SignJWT(u.ID, u.Email, secret, time.Duration(expiresMin)*time.Minute)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": "Server error"})
 	}
 
 	return c.JSON(fiber.Map{
 		"token": token,
-		"user": fiber.Map{"id": u.ID.Hex(), "name": u.Name, "email": u.Email},
+		"user":  fiber.Map{"id": u.ID, "name": u.Name, "email": u.Email},
 	})
 }
 
@@ -123,6 +123,6 @@ func Me(c *fiber.Ctx) error {
 	}
 
 	return c.JSON(fiber.Map{
-		"user": fiber.Map{"id": u.ID.Hex(), "name": u.Name, "email": u.Email},
+		"user": fiber.Map{"id": u.ID, "name": u.Name, "email": u.Email},
 	})
 }
