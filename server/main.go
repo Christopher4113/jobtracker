@@ -8,9 +8,9 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 
+	"server/controllers"
 	"server/helpers"
 	"server/services"
-	"server/controllers"
 )
 
 func main() {
@@ -29,11 +29,10 @@ func main() {
 		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
 	}))
 
-	// DB
-	if err := services.ConnectMongo(); err != nil {
+	// Initialize DynamoDB client
+	if err := services.InitDynamoDB(); err != nil {
 		log.Fatal(err)
 	}
-	defer services.DisconnectMongo()
 
 	// Routes
 	app.Get("/", func(c *fiber.Ctx) error {
